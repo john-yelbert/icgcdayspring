@@ -1,7 +1,7 @@
 // src/pages/admin/AddUserPage.tsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { db } from "../../database/schema";
+// import { db } from "../../database/schema";
 import { v4 as uuidv4 } from "uuid";
 
 const AddUserPage = () => {

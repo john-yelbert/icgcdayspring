@@ -1,7 +1,8 @@
-// src/pages/admin/Dashboard.tsx
 import React, { useEffect, useState } from "react";
-import { FaHome, FaUsers, FaEdit } from "react-icons/fa";
-import { db } from "@database/schema";
+import { FaUsers, FaEdit } from "react-icons/fa";
+import TableCard from "../../components/ui/TableCard";
+
+console.log("AdminDashboard loaded");
 
 interface User {
   id: string;
@@ -21,13 +22,36 @@ const AdminDashboard = () => {
   });
 
   useEffect(() => {
-    // Fetch recent users (last 5 registered)
-    const users = db.getAllUsers().slice(0, 5);
-    setRecentUsers(users);
+    const fetchUsersAndStats = async () => {
+      try {
+        // Fetch users
+        const usersRes = await fetch("http://localhost:3001/api/admin/users", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+          },
+          credentials: "include",
+        });
+        const usersData: User[] = await usersRes.json();
+        setRecentUsers(usersData.slice(0, 5)); // Keep only last 5
 
-    // Fetch user statistics
-    const stats = db.getUserStats();
-    setUserStats(stats);
+        // Fetch stats
+        const statsRes = await fetch(
+          "http://localhost:3001/api/admin/user-stats",
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+            },
+            credentials: "include",
+          }
+        );
+        const statsData = await statsRes.json();
+        setUserStats(statsData);
+      } catch (error) {
+        console.error("API Error:", error);
+      }
+    };
+
+    fetchUsersAndStats();
   }, []);
 
   const formatDate = (dateString: string) => {
@@ -41,8 +65,6 @@ const AdminDashboard = () => {
 
   return (
     <div className="container-fluid">
-      {/* ... other dashboard sections ... */}
-
       {/* Users Section */}
       <div className="row">
         <div className="col-lg-6 mb-4">
